@@ -22,7 +22,7 @@ def rates_in_range(to_cur, from_cur, start, end=date.today()):
 
 
 #-------------------------------------------------------------------------------
-#-------------------------------- Plotting -------------------------------------
+#---------------------------------- Plotting -----------------------------------
 #-------------------------------------------------------------------------------
 
 def plot_time_series(x_data, y_data, param_dict):
@@ -35,10 +35,12 @@ def plot_time_series(x_data, y_data, param_dict):
     if int(sqrtx_len) == sqrtx_len:
         n_rows, n_cols = sqrtx_len, sqrtx_len
     else:
-        n_rows, n_cols = int(sqrtx_len) + 1, int(sqrtx_len)
-    for i in range(x_len)
+        n_rows, n_cols = int(sqrtx_len) + 1, int(sqrtx_len) + 1
+    for i in range(x_len):
         ax = fig.add_subplot(n_rows, n_cols, i+1, **(param_dict[i]))
+        fig.autofmt_xdate()
         ax.plot(x_data[i], y_data[i])
+        ax.grid(which='both', axis='both')
     return 1
 
 
@@ -81,24 +83,28 @@ def plot_rate_comparison(pair1, pair2, start, end=date.today()):
     plt.show()
 
 
-def plot_rates_in_range(to_cur, from_cur, start, end=date.today()):
-    rate_sheet = rates_in_range(to_cur, from_cur, start, end)
-    param_dict = {
-        'title' : from_cur + "/" + to_cur + ", " + \
-            rate_sheet.index[0].strftime("%m-%d-%Y") + " to " + \
-            rate_sheet.index[-1].strftime("%m-%d-%Y"),
-        'xlabel' : "date",
-        'ylabel' : "exchange rate"
-    }
-    # WARNING: edit this to support list functionality in plot_time_series
-    plot_time_series(rate_sheet.index, rate_sheet["rate"], param_dict)
-    plt.gcf().autofmt_xdate()
+def plot_rates_in_range(to_curs, from_curs, start, end=date.today()):
+    to_curs_len = len(to_curs)
+    if to_curs_len != len(from_curs):
+        raise ValueError("Data size mismatch.")
+    rate_sheet, param_dict = [], []
+    for i in range(to_curs_len):
+        rate_sheet.append(rates_in_range(to_curs[i], from_curs[i], start, end))
+        param_dict.append({
+            'title' : from_curs[i] + "/" + to_curs[i] + ", " + \
+                rate_sheet[i].index[0].strftime("%m-%d-%Y") + " to " + \
+                rate_sheet[i].index[-1].strftime("%m-%d-%Y"),
+            'xlabel' : "date",
+            'ylabel' : "exchange rate"
+        })
+    plot_time_series([rs.index for rs in rate_sheet], [rs["rate"] for rs in rate_sheet], \
+        param_dict)
     plt.show()
 
 
 def main():
-    d = date(2019,1,1)
-    plot_rates_in_range("JPY", "USD", d)
+    d = date(2019,10,1)
+    plot_rates_in_range(["JPY", "GBP", "CHF"], ["USD", "USD", "USD"], d)
 
 
 if __name__ == '__main__':
