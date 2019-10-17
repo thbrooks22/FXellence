@@ -100,12 +100,3 @@ def plot_rates_in_range(to_curs, from_curs, start, end=date.today()):
     plot_time_series([rs.index for rs in rate_sheet], [rs["rate"] for rs in rate_sheet], \
         param_dict)
     plt.show()
-
-
-def main():
-    d = date(2019,1,1)
-    plot_rates_in_range(["JPY", "GBP", "CHF"], ["USD", "USD", "USD"], d)
-
-
-if __name__ == '__main__':
-    main()
