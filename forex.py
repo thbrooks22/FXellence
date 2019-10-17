@@ -38,10 +38,10 @@ def plot_time_series(x_data, y_data, param_dict):
         n_rows, n_cols = int(sqrtx_len) + 1, int(sqrtx_len) + 1
     for i in range(x_len):
         ax = fig.add_subplot(n_rows, n_cols, i+1, **(param_dict[i]))
-        fig.autofmt_xdate()
         ax.plot(x_data[i], y_data[i])
         ax.grid(which='both', axis='both')
-    return 1
+        plt.xticks(rotation=30, size='x-small')
+    plt.subplots_adjust(wspace=0.5, hspace=0.5)
 
 
 def plot_seasonal_trend(to_cur, from_cur, month, start_year, \
@@ -103,7 +103,7 @@ def plot_rates_in_range(to_curs, from_curs, start, end=date.today()):
 
 
 def main():
-    d = date(2019,10,1)
+    d = date(2019,1,1)
     plot_rates_in_range(["JPY", "GBP", "CHF"], ["USD", "USD", "USD"], d)
 
 
