@@ -16,6 +16,7 @@ pyvenv.cfg
 .venv
 env/
 venv/
+__pycache__
 fin/
 .fin
 ENV/
