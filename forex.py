@@ -133,7 +133,7 @@ y_rates_tf : iter of string pair (to, from) to be plotted against corresponding
 start : start date
 [end : end date]
 
-Desc: shows multiplot of scatteres of to/from on y-axis vs to/from on x-axis
+Desc: shows multiplot of scatters of from/to on y-axis vs from/to on x-axis
     for different currency pairs with linear regression.
 """
 def plot_rate_comparison(x_rates_tf, y_rates_tf, start, end=date.today()):
@@ -161,6 +161,17 @@ def plot_rate_comparison(x_rates_tf, y_rates_tf, start, end=date.today()):
         y_rate_sheet], regression, param_dict)
 
 
+"""
+fun : string iter * string iter * datetime.date [* datetime.date] -> ()
+
+Args:
+to_curs : list of currency denominators
+from_curs : list of currency numerators
+start : start date
+[end : end date]
+
+Desc: shows multiplot of time series of from/to value from start to end.
+"""
 def plot_rates_in_range(to_curs, from_curs, start, end=date.today()):
     to_curs_len = len(to_curs)
     if to_curs_len != len(from_curs):
