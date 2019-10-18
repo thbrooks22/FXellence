@@ -12,6 +12,18 @@ c = C()
 pd.plotting.register_matplotlib_converters()
 
 
+"""
+fun : string * string * datetime.date * [datetime.date] -> pd.DataFrame
+
+Args:
+to_cur : currency denominator
+from_cur : currency numerator
+start : start date
+[end : end date]
+
+Desc: returns pd.DataFrame of from_cur/to_cur as valued daily by ECB from start to
+    end dates.
+"""
 def rates_in_range(to_cur, from_cur, start, end=date.today()):
     dates = [start + timedelta(i) for i in \
         range((end - start + timedelta(1)).days)]
@@ -25,6 +37,17 @@ def rates_in_range(to_cur, from_cur, start, end=date.today()):
 #---------------------------------- Plotting -----------------------------------
 #-------------------------------------------------------------------------------
 
+"""
+fun : datetime.date iter * float iter * dict -> ()
+
+Args:
+x_data : datetime.date iter of x-axis data
+y_data : float iter of y-axis data
+param_dict : dictionary of plot parameters
+
+Desc: shows plot of y_data values vs x_data date range with param_dict parameters
+    applied.
+"""
 def plot_time_series(x_data, y_data, param_dict):
     x_len = len(x_data)
     y_len = len(y_data)
@@ -42,6 +65,41 @@ def plot_time_series(x_data, y_data, param_dict):
         ax.grid(which='both', axis='both')
         plt.xticks(rotation=30, size='x-small')
     plt.subplots_adjust(wspace=0.5, hspace=0.5)
+    plt.show()
+
+
+"""
+fun : float iter * float iter * dict * dict -> ()
+
+Args:
+x_data : float iter of x_axis data
+y_data : float iter of y_axis data
+linear_regression : dict of regression values slope, intercept, line, r_value
+param_dict : dictionary of plot parameters
+
+Desc: shows plot of scattered y_data vs x_data with linear regression line
+    and r value and param_dict parameters applied.
+"""
+def plot_scatter(x_data, y_data, linear_regression, param_dict):
+    x_len = len(x_data)
+    y_len = len(y_data)
+    if x_len != y_len or y_len != len(param_dict):
+        raise ValueError("Data size mismatch.")
+    fig = plt.figure()
+    sqrtx_len = np.sqrt(x_len)
+    if int(sqrtx_len) == sqrtx_len:
+        n_rows, n_cols = sqrtx_len, sqrtx_len
+    else:
+        n_rows, n_cols = int(sqrtx_len) + 1, int(sqrtx_len) + 1
+    for i in range(x_len):
+        ax = fig.add_subplot(n_rows, n_cols, i+1, **(param_dict[i]))
+        ax.scatter(x_data[i], y_data[i])
+        regression, = ax.plot(x_data[i], linear_regression[i]["line"])
+        ax.legend([regression], \
+            ["y = %f*x + %f\nr = %f" % (linear_regression[i]["slope"], \
+            linear_regression[i]["intercept"], linear_regression[i]["r_value"])])
+    plt.subplots_adjust(wspace=0.5, hspace=0.5)
+    plt.show()
 
 
 def plot_seasonal_trend(to_cur, from_cur, month, start_year, \
@@ -63,24 +121,29 @@ def plot_seasonal_trend(to_cur, from_cur, month, start_year, \
     plt.show()
 
 
-def plot_rate_comparison(pair1, pair2, start, end=date.today()):
-    to1, from1 = pair1
-    to2, from2 = pair2
-    rates1 = rates_in_range(to1, from1, start, end)
-    rates2 = rates_in_range(to2, from2, start, end)
-    slope, intercept, r_value, p_value, std_err = \
-        stats.linregress(rates1["rate"], rates2["rate"])
-    line = slope * rates1["rate"] + intercept
-    plt.plot(rates1["rate"], rates2["rate"], 'o')
-    regression, = plt.plot(rates1["rate"], line)
-    plt.legend([regression], \
-        ["y = %f*x + %f\nr = %f" % (slope, intercept, r_value)])
-    plt.title(from2 + "/" + to2 + " vs. " + from1 + "/" + to1 + ", " + \
-        rates1.index[0].strftime("%m-%d-%Y") + " to " + \
-        rates1.index[-1].strftime("%m-%d-%Y"))
-    plt.xlabel(from1 + "/" + to1, c="blue")
-    plt.ylabel(from2 + "/" + to2, c="blue")
-    plt.show()
+def plot_rate_comparison(x_rates_tf, y_rates_tf, start, end=date.today()):
+    x_len = len(x_rates_tf)
+    if x_len != len(y_rates_tf):
+        raise ValueError("Data size mismatch.")
+    x_rate_sheet, y_rate_sheet, regression, param_dict = [], [], [], []
+    for i in range(x_len):
+        x_rate_sheet.append(rates_in_range(x_rates_tf[i][0], x_rates_tf[i][1], start, end))
+        y_rate_sheet.append(rates_in_range(y_rates_tf[i][0], y_rates_tf[i][1], start, end))
+        regression.append({})
+        regression[i]["slope"], regression[i]["intercept"], regression[i]["r_value"], _, _ = \
+            stats.linregress(x_rate_sheet[i]["rate"], y_rate_sheet[i]["rate"])
+        regression[i]["line"] = regression[i]["slope"] * x_rate_sheet[i]["rate"] \
+            + regression[i]["intercept"]
+        param_dict.append({
+            'title' : y_rates_tf[i][1] + "/" + y_rates_tf[i][0] + " vs. " + \
+                x_rates_tf[i][1] + "/" + x_rates_tf[i][0] + ", " + \
+                x_rate_sheet[i].index[0].strftime("%m-%d-%Y") + " to " + \
+                x_rate_sheet[i].index[-1].strftime("%m-%d-%Y"),
+            'xlabel' : x_rates_tf[i][1] + "/" + x_rates_tf[i][0],
+            'ylabel' : y_rates_tf[i][1] + "/" + y_rates_tf[i][0]
+        })
+    plot_scatter([xrs["rate"] for xrs in x_rate_sheet], [yrs["rate"] for yrs in \
+        y_rate_sheet], regression, param_dict)
 
 
 def plot_rates_in_range(to_curs, from_curs, start, end=date.today()):
@@ -99,4 +162,3 @@ def plot_rates_in_range(to_curs, from_curs, start, end=date.today()):
         })
     plot_time_series([rs.index for rs in rate_sheet], [rs["rate"] for rs in rate_sheet], \
         param_dict)
-    plt.show()

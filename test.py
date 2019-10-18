@@ -3,8 +3,8 @@ from datetime import date
 
 
 def main():
-    d = date(2019,1,1)
-    plot_rates_in_range(["JPY", "GBP", "CHF"], ["USD", "USD", "USD"], d)
+    d = date(2019,10,1)
+    plot_rate_comparison([["USD", "GBP"], ["JPY", "USD"]], [["GBP", "CHF"], ["JPY", "CHF"]], d)
 
 
 if __name__ == '__main__':
