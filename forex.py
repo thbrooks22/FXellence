@@ -48,22 +48,33 @@ param_dict : dictionary of plot parameters
 Desc: shows plot of y_data values vs x_data date range with param_dict parameters
     applied.
 """
-def plot_time_series(x_data, y_data, param_dict):
+def plot_time_series(x_data, y_data, param_dict, sma_data=None):
     x_len = len(x_data)
     y_len = len(y_data)
     if x_len != y_len or y_len != len(param_dict):
         raise ValueError("Data size mismatch.")
-    fig = plt.figure()
     sqrtx_len = np.sqrt(x_len)
     if int(sqrtx_len) == sqrtx_len:
         n_rows, n_cols = sqrtx_len, sqrtx_len
     else:
         n_rows, n_cols = int(sqrtx_len) + 1, int(sqrtx_len) + 1
-    for i in range(x_len):
-        ax = fig.add_subplot(n_rows, n_cols, i+1, **(param_dict[i]))
-        ax.plot(x_data[i], y_data[i])
-        ax.grid(which='both', axis='both')
-        plt.xticks(rotation=30, size='x-small')
+    fig = plt.figure()
+    if not sma_data:
+        for i in range(x_len):
+            ax = fig.add_subplot(n_rows, n_cols, i+1, **(param_dict[i]))
+            ax.plot(x_data[i], y_data[i])
+            ax.grid(which='both', axis='both')
+            plt.xticks(rotation=30, size='x-small')
+    else:
+        sma, sma_rates = sma_data
+        l = len(x_data[0])
+        for i in range(x_len):
+            ax = fig.add_subplot(n_rows, n_cols, i+1, **(param_dict[i]))
+            ax.plot(x_data[i], y_data[i])
+            ax.plot(x_data[i], [np.mean(sma_rates[i][j:sma+j]) for j in \
+                range(l)], mfc='red')
+            ax.grid(which='both', axis='both')
+            plt.xticks(rotation=30, size='x-small')
     plt.subplots_adjust(wspace=0.5, hspace=0.5)
     plt.show()
 
@@ -172,19 +183,34 @@ start : start date
 
 Desc: shows multiplot of time series of from/to value from start to end.
 """
-def plot_rates_in_range(to_curs, from_curs, start, end=date.today()):
+def plot_rates_in_range(to_curs, from_curs, start, end=date.today(), sma=None):
     to_curs_len = len(to_curs)
     if to_curs_len != len(from_curs):
         raise ValueError("Data size mismatch.")
     rate_sheet, param_dict = [], []
-    for i in range(to_curs_len):
-        rate_sheet.append(rates_in_range(to_curs[i], from_curs[i], start, end))
-        param_dict.append({
-            'title' : from_curs[i] + "/" + to_curs[i] + ", " + \
-                rate_sheet[i].index[0].strftime("%m-%d-%Y") + " to " + \
-                rate_sheet[i].index[-1].strftime("%m-%d-%Y"),
-            'xlabel' : "date",
-            'ylabel' : "exchange rate"
-        })
-    plot_time_series([rs.index for rs in rate_sheet], [rs["rate"] for rs in rate_sheet], \
-        param_dict)
+    if not sma:
+        for i in range(to_curs_len):
+            rate_sheet.append(rates_in_range(to_curs[i], from_curs[i], start, end))
+            param_dict.append({
+                'title' : from_curs[i] + "/" + to_curs[i] + ", " + \
+                    rate_sheet[i].index[0].strftime("%m-%d-%Y") + " to " + \
+                    rate_sheet[i].index[-1].strftime("%m-%d-%Y"),
+                'xlabel' : "date",
+                'ylabel' : "exchange rate"
+            })
+        plot_time_series([rs.index for rs in rate_sheet], [rs["rate"] for rs in \
+            rate_sheet], param_dict)
+    else:
+        sma_sheet = [rates_in_range(to_curs[i], from_curs[i], start - timedelta(sma), \
+            end) for i in range(to_curs_len)]
+        for i in range(to_curs_len):
+            rate_sheet.append(rates_in_range(to_curs[i], from_curs[i], start, end))
+            param_dict.append({
+                'title' : from_curs[i] + "/" + to_curs[i] + ", " + \
+                    rate_sheet[i].index[0].strftime("%m-%d-%Y") + " to " + \
+                    rate_sheet[i].index[-1].strftime("%m-%d-%Y"),
+                'xlabel' : "date",
+                'ylabel' : "exchange rate"
+            })
+        plot_time_series([rs.index for rs in rate_sheet], [rs["rate"] for rs in \
+            rate_sheet], param_dict, (sma, [sms["rate"] for sms in sma_sheet]))
