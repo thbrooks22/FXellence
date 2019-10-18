@@ -5,7 +5,7 @@ from scipy import stats
 from matplotlib import dates
 from matplotlib import pyplot as plt
 from matplotlib import axes
-from datetime import *
+from datetime import date, timedelta
 from forex_python.converter import CurrencyRates as C
 
 c = C()
