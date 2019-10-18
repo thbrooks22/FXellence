@@ -13,7 +13,7 @@ pd.plotting.register_matplotlib_converters()
 
 
 """
-fun : string * string * datetime.date * [datetime.date] -> pd.DataFrame
+fun : string * string * datetime.date [* datetime.date] -> pd.DataFrame
 
 Args:
 to_cur : currency denominator
@@ -121,6 +121,21 @@ def plot_seasonal_trend(to_cur, from_cur, month, start_year, \
     plt.show()
 
 
+"""
+fun : (string iter) iter * (string iter) iter * datetime.date [* datetime.date]
+    -> ()
+
+Args:
+x_rates_tf : iter of string pair (to, from) to be plotted against corresponding
+    y-pairs
+y_rates_tf : iter of string pair (to, from) to be plotted against corresponding
+    x-pairs
+start : start date
+[end : end date]
+
+Desc: shows multiplot of scatteres of to/from on y-axis vs to/from on x-axis
+    for different currency pairs with linear regression.
+"""
 def plot_rate_comparison(x_rates_tf, y_rates_tf, start, end=date.today()):
     x_len = len(x_rates_tf)
     if x_len != len(y_rates_tf):

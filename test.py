@@ -3,7 +3,7 @@ from datetime import date
 
 
 def main():
-    d = date(2019,10,1)
+    d = date(2019,8,1)
     plot_rate_comparison([["USD", "GBP"], ["JPY", "USD"]], [["GBP", "CHF"], ["JPY", "CHF"]], d)
 
 
