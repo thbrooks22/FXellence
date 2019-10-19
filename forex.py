@@ -78,9 +78,11 @@ def plot_time_series(x_data, y_data, param_dict, sma_data=None):
                 np.std(sma_sheet[i][j:sma+j]) for j in range(l)]
             ax = fig.add_subplot(n_rows, n_cols, i+1, **(param_dict[i]))
             ax.plot(x_data[i], y_data[i])
-            ax.plot(x_data[i], sma_plot, mfc='red')
-            ax.plot(x_data[i], upper_bol_plot, mfc='green')
-            ax.plot(x_data[i], lower_bol_plot, mfc='black')
+            ma, = ax.plot(x_data[i], sma_plot)
+            upper_bol, = ax.plot(x_data[i], upper_bol_plot)
+            lower_bol, = ax.plot(x_data[i], lower_bol_plot)
+            ax.legend((ma, upper_bol, lower_bol), ("%d day moving avg" % sma, \
+            "upper band", "lower band"))
             ax.grid(which='both', axis='both')
             plt.xticks(rotation=30, size='x-small')
     plt.subplots_adjust(wspace=0.5, hspace=0.5)
