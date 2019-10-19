@@ -8,6 +8,7 @@ from matplotlib import axes
 from datetime import date, timedelta
 from forex_python.converter import CurrencyRates as C
 
+
 c = C()
 pd.plotting.register_matplotlib_converters()
 
@@ -38,12 +39,13 @@ def rates_in_range(to_cur, from_cur, start, end=date.today()):
 #-------------------------------------------------------------------------------
 
 """
-fun : datetime.date iter * float iter * dict -> ()
+fun : datetime.date iter * float iter * dict [* float iter] -> ()
 
 Args:
 x_data : datetime.date iter of x-axis data
 y_data : float iter of y-axis data
 param_dict : dictionary of plot parameters
+[sma_data : data to compute simple moving average]
 
 Desc: shows plot of y_data values vs x_data date range with param_dict parameters
     applied.
@@ -66,13 +68,19 @@ def plot_time_series(x_data, y_data, param_dict, sma_data=None):
             ax.grid(which='both', axis='both')
             plt.xticks(rotation=30, size='x-small')
     else:
-        sma, sma_rates = sma_data
+        sma, sma_sheet = sma_data
         l = len(x_data[0])
         for i in range(x_len):
+            sma_plot = [np.mean(sma_sheet[i][j:sma+j]) for j in range(l)]
+            upper_bol_plot = [np.mean(sma_sheet[i][j:sma+j]) + 2 * \
+                np.std(sma_sheet[i][j:sma+j]) for j in range(l)]
+            lower_bol_plot = [np.mean(sma_sheet[i][j:sma+j]) - 2 * \
+                np.std(sma_sheet[i][j:sma+j]) for j in range(l)]
             ax = fig.add_subplot(n_rows, n_cols, i+1, **(param_dict[i]))
             ax.plot(x_data[i], y_data[i])
-            ax.plot(x_data[i], [np.mean(sma_rates[i][j:sma+j]) for j in \
-                range(l)], mfc='red')
+            ax.plot(x_data[i], sma_plot, mfc='red')
+            ax.plot(x_data[i], upper_bol_plot, mfc='green')
+            ax.plot(x_data[i], lower_bol_plot, mfc='black')
             ax.grid(which='both', axis='both')
             plt.xticks(rotation=30, size='x-small')
     plt.subplots_adjust(wspace=0.5, hspace=0.5)
@@ -173,15 +181,17 @@ def plot_rate_comparison(x_rates_tf, y_rates_tf, start, end=date.today()):
 
 
 """
-fun : string iter * string iter * datetime.date [* datetime.date] -> ()
+fun : string iter * string iter * datetime.date [* datetime.date] [* int] -> ()
 
 Args:
 to_curs : list of currency denominators
 from_curs : list of currency numerators
 start : start date
 [end : end date]
+[sma : days over which to calculate simple moving average]
 
-Desc: shows multiplot of time series of from/to value from start to end.
+Desc: shows multiplot of time series of from/to value from start to end, potentially
+    displaying simple moving average and bollinger bands.
 """
 def plot_rates_in_range(to_curs, from_curs, start, end=date.today(), sma=None):
     to_curs_len = len(to_curs)
