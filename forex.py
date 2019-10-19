@@ -64,7 +64,7 @@ def plot_time_series(x_data, y_data, param_dict, sma_data=None):
     if not sma_data:
         for i in range(x_len):
             ax = fig.add_subplot(n_rows, n_cols, i+1, **(param_dict[i]))
-            ax.plot(x_data[i], y_data[i])
+            ax.plot(x_data[i], y_data[i], color="black")
             ax.grid(which='both', axis='both')
             plt.xticks(rotation=30, size='x-small')
     else:
@@ -77,10 +77,11 @@ def plot_time_series(x_data, y_data, param_dict, sma_data=None):
             lower_bol_plot = [np.mean(sma_sheet[i][j:sma+j]) - 2 * \
                 np.std(sma_sheet[i][j:sma+j]) for j in range(l)]
             ax = fig.add_subplot(n_rows, n_cols, i+1, **(param_dict[i]))
-            ax.plot(x_data[i], y_data[i])
+            ax.plot(x_data[i], y_data[i], color="black")
             ma, = ax.plot(x_data[i], sma_plot)
             upper_bol, = ax.plot(x_data[i], upper_bol_plot)
             lower_bol, = ax.plot(x_data[i], lower_bol_plot)
+            ax.fill_between(x_data[i], lower_bol_plot, upper_bol_plot, color="grey")
             ax.legend((ma, upper_bol, lower_bol), ("%d day moving avg" % sma, \
                 "upper band", "lower band"))
             ax.grid(which='both', axis='both')
