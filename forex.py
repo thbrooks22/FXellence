@@ -82,7 +82,7 @@ def plot_time_series(x_data, y_data, param_dict, sma_data=None):
             upper_bol, = ax.plot(x_data[i], upper_bol_plot)
             lower_bol, = ax.plot(x_data[i], lower_bol_plot)
             ax.legend((ma, upper_bol, lower_bol), ("%d day moving avg" % sma, \
-            "upper band", "lower band"))
+                "upper band", "lower band"))
             ax.grid(which='both', axis='both')
             plt.xticks(rotation=30, size='x-small')
     plt.subplots_adjust(wspace=0.5, hspace=0.5)
