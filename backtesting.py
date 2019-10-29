@@ -10,7 +10,7 @@ class Ruleset:
 
     def add_rule(self, rule_id, rule, overwrite=False):
         if rule_id in self.rules and not overwrite:
-            print("Overwrite detected. Switch overwrite on to proceed.")
+            print("Overwrite detected. Switch overwrite on to replace rule.")
         else:
             self.rules[rule_id] = rule
 
@@ -22,10 +22,10 @@ class Ruleset:
             print("Rule " + rule_id + " does not exist.")
 
 
-    def execute(self, portfolio, rate_sheet):
+    def execute(self, portfolio, day):
         new_port = portfolio
         for rule in self.rules:
-            new_port = self.rules[rule](new_port, rate_sheet)
+            new_port = self.rules[rule](new_port, tf_pair, day)
         return new_port
 
 
@@ -37,6 +37,5 @@ class Backtester:
         new_port = portfolio
         for day in [start + timedelta(i) for i in \
             range((end - start + timedelta(1)).days)]:
-            rate_sheet = #COMPLETE RATE SHEET CONSTRUCTION, should be efficient
-            new_port = self.ruleset.execute(new_port, rate_sheet)
+            new_port = self.ruleset.execute(new_port, day)
         return new_port

@@ -227,3 +227,23 @@ def plot_rates_in_range(to_curs, from_curs, start, end=date.today(), sma=None):
             })
         plot_time_series([rs.index for rs in rate_sheet], [rs["rate"] for rs in \
             rate_sheet], param_dict, (sma, [sms["rate"] for sms in sma_sheet]))
+
+
+#-------------------------------------------------------------------------------
+#--------------------------------- Technicals ----------------------------------
+#-------------------------------------------------------------------------------
+
+def sma(to_cur, from_cur, today, days):
+    return np.mean([rates_in_range(to_curs[i], from_curs[i], today - \
+        timedelta(days), today) for i in range(to_curs_len)])
+
+
+def bollinger(to_cur, from_cur, today, days, upper=True):
+    if upper:
+        return sma(to_cur, from_cur, today, days) + 2 * \
+            np.std([rates_in_range(to_curs[i], from_curs[i], today - \
+            timedelta(days), today) for i in range(to_curs_len)])
+    else:
+        return sma(to_cur, from_cur, today, days) - 2 * \
+            np.std([rates_in_range(to_curs[i], from_curs[i], today - \
+            timedelta(days), today) for i in range(to_curs_len)])
