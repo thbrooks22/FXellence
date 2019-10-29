@@ -1,4 +1,8 @@
-from forex import *
+import sys
+sys.path.append('../backtesting')
+sys.path.append('../helpers')
+
+from forex_helpers import *
 from datetime import date
 
 

@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../helpers')
 import finance_helpers as fin
 from forex_helpers import rates_in_range, sma, bollinger
 from datetime import date, timedelta
