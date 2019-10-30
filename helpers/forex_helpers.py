@@ -234,16 +234,16 @@ def plot_rates_in_range(to_curs, from_curs, start, end=date.today(), sma=None):
 #-------------------------------------------------------------------------------
 
 def sma(to_cur, from_cur, today, days):
-    return np.mean([rates_in_range(to_curs[i], from_curs[i], today - \
-        timedelta(days), today) for i in range(to_curs_len)])
+    return np.mean(rates_in_range(to_cur, from_cur, today - timedelta(days),
+        today)["rate"])
 
 
 def bollinger(to_cur, from_cur, today, days, upper=True):
     if upper:
         return sma(to_cur, from_cur, today, days) + 2 * \
-            np.std([rates_in_range(to_curs[i], from_curs[i], today - \
-            timedelta(days), today) for i in range(to_curs_len)])
+            np.std(rates_in_range(to_cur, from_cur, today - timedelta(days), \
+            today)["rate"])
     else:
-        return sma(to_cur, from_cur, today, days) - 2 * \
-            np.std([rates_in_range(to_curs[i], from_curs[i], today - \
-            timedelta(days), today) for i in range(to_curs_len)])
+        return sma(to_cur, from_cur, today, days) + 2 * \
+            np.std(rates_in_range(to_cur, from_cur, today - timedelta(days), \
+            today)["rate"])

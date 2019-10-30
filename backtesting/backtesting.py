@@ -1,13 +1,12 @@
 import sys
 sys.path.append('../helpers')
 import finance_helpers as fin
-from forex_helpers import rates_in_range, sma, bollinger
 from datetime import date, timedelta
 
 
 class Ruleset:
-    def __init__(self, rules):
-        self.rules = rules
+    def __init__(self, rules_dict):
+        self.rules = rules_dict
 
 
     def add_rule(self, rule_id, rule, overwrite=False):
@@ -27,7 +26,7 @@ class Ruleset:
     def execute(self, portfolio, day):
         new_port = portfolio
         for rule in self.rules:
-            new_port = self.rules[rule](new_port, tf_pair, day)
+            new_port = self.rules[rule](new_port, day)
         return new_port
 
 
@@ -41,3 +40,13 @@ class Backtester:
             range((end - start + timedelta(1)).days)]:
             new_port = self.ruleset.execute(new_port, day)
         return new_port
+
+
+class Portfolio:
+    def __init__(self, portfolio_dict):
+        self.sheet = portfolio_dict
+
+    def update(self, key, val):
+        if key not in self.sheet:
+            raise KeyError(key + " is missing from the portfolio.")
+        self.sheet[key] = val
