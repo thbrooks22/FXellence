@@ -34,6 +34,7 @@ class Backtester:
     def __init__(self, ruleset):
         self.ruleset = ruleset
 
+
     def execute(self, portfolio, start, end=date.today()):
         new_port = portfolio
         for day in [start + timedelta(i) for i in \
@@ -46,7 +47,19 @@ class Portfolio:
     def __init__(self, portfolio_dict):
         self.sheet = portfolio_dict
 
+
     def update(self, key, val):
         if key not in self.sheet:
             raise KeyError(key + " is missing from the portfolio.")
         self.sheet[key] = val
+
+
+    def transfer(self, from, to, amount, rate):
+        if from not in self.sheet:
+            raise KeyError(from + " is missing from the portfolio.")
+        if to not in self.sheet:
+            raise KeyError(to + " is missing from the portfolio.")
+        if self.sheet[from] < amount:
+            raise ValueError(from + " cannot transfer sufficient funds.")
+        self.update(to, self.sheet[to] + amount * rate)
+        self.update(from, self.sheet[from] - amount)
