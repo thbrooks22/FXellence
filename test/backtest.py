@@ -7,12 +7,13 @@ from datetime import date, timedelta
 
 def bollinger_bounce_test(portfolio, day):
     rate = rates_in_range("GBP", "USD", day, day)["rate"][0]
-    if (rate > bollinger("GBP", "USD", day, 50)):
+    rates, upper_bol_rate = bollinger("GBP", "USD", day, 50)
+    _, lower_bol_rate = bollinger(None, None, None, None, upper=False, rates=rates)
+    if (rate > upper_bol_rate):
         portfolio.update("GBP", portfolio.sheet["GBP"] + rate * \
             portfolio.sheet["USD"])
         portfolio.update("USD", 0)
-    elif (rate < bollinger("GBP", "USD", day, 50, \
-        upper=False)):
+    elif (rate < lower_bol_rate):
         portfolio.update("USD", portfolio.sheet["USD"] + (1 / rate) * \
             portfolio.sheet["GBP"])
         portfolio.update("GBP", 0)

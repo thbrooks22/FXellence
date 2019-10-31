@@ -233,15 +233,19 @@ def plot_rates_in_range(to_curs, from_curs, start, end=date.today(), sma=None):
 #--------------------------------- Technicals ----------------------------------
 #-------------------------------------------------------------------------------
 
-def sma(to_cur, from_cur, today, days):
-    rates = rates_in_range(to_cur, from_cur, today - timedelta(days),
-        today)["rate"]
+def sma(to_cur, from_cur, today, days, rates=None):
+    if not rates:
+        rates = rates_in_range(to_cur, from_cur, today - timedelta(days),
+            today)["rate"]
     return rates, np.mean(rates)
 
 
-def bollinger(to_cur, from_cur, today, days, upper=True):
-    rates, sma_rates = sma(to_cur, from_cur, today, days)
-    if upper:
-        return sma_rates + 2 * np.std(rates))
+def bollinger(to_cur, from_cur, today, days, upper=True, rates=None):
+    if not rates:
+        rates, sma_rates = sma(to_cur, from_cur, today, days)
     else:
-        return sma_rates - 2 * np.std(rates))
+        rates, sma_rates = sma(None, None, None, None, rates)
+    if upper:
+        return rates, sma_rates + 2 * np.std(rates))
+    else:
+        return rates, sma_rates - 2 * np.std(rates))
