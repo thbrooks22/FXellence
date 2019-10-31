@@ -241,11 +241,10 @@ def sma(to_cur, from_cur, today, days, rates=None):
 
 
 def bollinger(to_cur, from_cur, today, days, upper=True, rates=None):
-    if not rates:
+    if rates == None:
         rates, sma_rates = sma(to_cur, from_cur, today, days)
     else:
         rates, sma_rates = sma(None, None, None, None, rates)
     if upper:
-        return rates, sma_rates + 2 * np.std(rates))
-    else:
-        return rates, sma_rates - 2 * np.std(rates))
+        return rates, sma_rates + 2 * np.std(rates)
+    return rates, sma_rates - 2 * np.std(rates)

@@ -48,6 +48,10 @@ class Portfolio:
         self.sheet = portfolio_dict
 
 
+    def __str__(self):
+        return str(self.sheet)
+
+
     def update(self, key, val):
         if key not in self.sheet:
             raise KeyError(key + " is missing from the portfolio.")
