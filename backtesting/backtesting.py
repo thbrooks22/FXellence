@@ -54,12 +54,12 @@ class Portfolio:
         self.sheet[key] = val
 
 
-    def transfer(self, from, to, amount, rate):
-        if from not in self.sheet:
-            raise KeyError(from + " is missing from the portfolio.")
+    def transfer(self, frm, to, amount, rate):
+        if frm not in self.sheet:
+            raise KeyError(frm + " is missing from the portfolio.")
         if to not in self.sheet:
             raise KeyError(to + " is missing from the portfolio.")
-        if self.sheet[from] < amount:
-            raise ValueError(from + " cannot transfer sufficient funds.")
+        if self.sheet[frm] < amount:
+            raise ValueError(frm + " cannot transfer sufficient funds.")
         self.update(to, self.sheet[to] + amount * rate)
-        self.update(from, self.sheet[from] - amount)
+        self.update(frm, self.sheet[frm] - amount)
