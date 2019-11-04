@@ -61,7 +61,7 @@ def plot_time_series(x_data, y_data, param_dict, sma_data=None):
     else:
         n_rows, n_cols = int(sqrtx_len) + 1, int(sqrtx_len) + 1
     fig = plt.figure()
-    if not sma_data:
+    if sma_data is None:
         for i in range(x_len):
             ax = fig.add_subplot(n_rows, n_cols, i+1, **(param_dict[i]))
             ax.plot(x_data[i], y_data[i], color="black")
@@ -201,7 +201,7 @@ def plot_rates_in_range(to_curs, from_curs, start, end=date.today(), sma=None):
     if to_curs_len != len(from_curs):
         raise ValueError("Data size mismatch.")
     rate_sheet, param_dict = [], []
-    if not sma:
+    if sma is None:
         for i in range(to_curs_len):
             rate_sheet.append(rates_in_range(to_curs[i], from_curs[i], start, end))
             param_dict.append({
