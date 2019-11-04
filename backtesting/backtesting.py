@@ -23,11 +23,12 @@ class Ruleset:
             print("Rule " + rule_id + " does not exist.")
 
 
-    def execute(self, portfolio, day):
-        new_port = portfolio
+    def execute(self, portfolio, day, memo):
         for rule in self.rules:
-            new_port = self.rules[rule](new_port, day)
-        return new_port
+            memo, portfolio = self.rules[rule](portfolio, day, memo)
+        return memo, portfolio
+
+
 
 
 class Backtester:
@@ -36,11 +37,11 @@ class Backtester:
 
 
     def execute(self, portfolio, start, end=date.today()):
-        new_port = portfolio
+        memo = None
         for day in [start + timedelta(i) for i in \
             range((end - start + timedelta(1)).days)]:
-            new_port = self.ruleset.execute(new_port, day)
-        return new_port
+            memo, portfolio = self.ruleset.execute(portfolio, day, memo)
+        return portfolio
 
 
 class Portfolio:
