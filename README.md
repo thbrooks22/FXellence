@@ -1,2 +1,2 @@
 # FXellence
-Foreign Exchange data analytics.
+Foreign Exchange data analytics, backtesting, and more.
