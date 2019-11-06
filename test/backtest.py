@@ -1,5 +1,6 @@
 import sys
 sys.path.append('../backtesting')
+sys.path.append('../helpers')
 from backtesting import Ruleset, Backtester, Portfolio
 from forex_helpers import rates_in_range, sma, bollinger
 from datetime import date, timedelta
@@ -8,7 +9,7 @@ from datetime import date, timedelta
 def bollinger_bounce_test(portfolio, day, memo):
     rate = rates_in_range("GBP", "USD", day, day)["rate"][0]
     if memo is None:
-        memo, upper_bol_rate = bollinger("GBP", "USD", day, 200)
+        memo, upper_bol_rate = bollinger("GBP", "USD", day, 100)
         memo = list(memo)
     else:
         memo, upper_bol_rate = bollinger(None, None, None, None, rates=memo[1:] + [rate])
@@ -21,7 +22,7 @@ def bollinger_bounce_test(portfolio, day, memo):
     print("RATE: " + str(rate))
     print("UPPER: " + str(upper_bol_rate))
     print("LOWER: " + str(lower_bol_rate))
-    print(portfolio.sheet, flush=True)
+    print(portfolio.sheet)
     return memo, portfolio
 
 
