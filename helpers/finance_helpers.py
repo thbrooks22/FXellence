@@ -107,20 +107,6 @@ def present_value(future_value, discount_rate, num_periods):
 
 """
 dcf_present_value : present value of a financial asset according to the dcf
-    model between time t and time t+1
-
-Args
-expected_price (float) : expected price of a financial asset at time t+1
-expected_return (float) : expected simple return on investment between time t
-    and time t+1 (assumes constant returns)
-(opt) dividend (float) : dividend paid to investor between time t and time t+1
-"""
-def dcf_present_value(expected_price, expected_return, dividend=0):
-    return (expected_price + dividend) / (1 + expected_return)
-
-
-"""
-dcf_present_value : present value of a financial asset according to the dcf
     model between time t and time t+k
 
 Args
@@ -130,7 +116,7 @@ expected_return (float) : expected simple return on investment per period
 expected_dividends (np.ndarray) : expected dividends paid to investor per period
     between time t and time t+k
 """
-def dcf_multi_present_value(expected_price, expected_return, expected_dividends):
+def dcf_present_value(expected_price, expected_return, expected_dividends):
     num_periods = len(expected_dividends)
     sum = 0
     for i in range(num_periods):
