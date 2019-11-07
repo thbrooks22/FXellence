@@ -6,6 +6,8 @@ from datetime import date, timedelta
 
 class Ruleset:
     def __init__(self, rules_dict):
+        if not isinstance(rules_dict, dict):
+            raise TypeError("Argument must be of type 'dict.'")
         self.rules = rules_dict
 
 
@@ -17,10 +19,9 @@ class Ruleset:
 
 
     def del_rule(self, rule_id):
-        try:
-            del(self.rules[rule_id])
-        except KeyError:
-            print("Rule " + rule_id + " does not exist.")
+        if rule_id not in self.rules:
+            raise KeyError("Rule " + str(rule_id) + " does not exist.")
+        del(self.rules[rule_id])
 
 
     def execute(self, portfolio, day, memo):
@@ -33,6 +34,8 @@ class Ruleset:
 
 class Backtester:
     def __init__(self, ruleset):
+        if not isinstance(ruleset, Ruleset):
+            raise TypeError("Argument must be of type 'Ruleset.'")
         self.ruleset = ruleset
 
 
@@ -44,27 +47,34 @@ class Backtester:
         return portfolio
 
 
+
 class Portfolio:
     def __init__(self, portfolio_dict):
         self.sheet = portfolio_dict
 
 
-    def __str__(self):
+    def __repr__(self):
         return str(self.sheet)
+
+
+    def open_position(self, key, val):
+        if key in self.sheet:
+            raise KeyError("Unable to open position for existing key " + key + ".")
+        self.sheet[str(key)] = val
 
 
     def update(self, key, val):
         if key not in self.sheet:
             raise KeyError(key + " is missing from the portfolio.")
-        self.sheet[key] = val
+        self.sheet[str(key)] = val
 
 
     def transfer(self, frm, to, amount, rate):
         if frm not in self.sheet:
-            raise KeyError(frm + " is missing from the portfolio.")
+            raise KeyError(str(frm) + " is missing from the portfolio.")
         if to not in self.sheet:
-            raise KeyError(to + " is missing from the portfolio.")
+            raise KeyError(str(to) + " is missing from the portfolio.")
         if self.sheet[frm] < amount:
-            raise ValueError(frm + " cannot transfer sufficient funds.")
+            raise ValueError(str(frm) + " cannot transfer sufficient funds.")
         self.update(to, self.sheet[to] + amount * rate)
         self.update(frm, self.sheet[frm] - amount)
